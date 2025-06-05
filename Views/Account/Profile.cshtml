@@ -1,0 +1,44 @@
+@model GalleryApp.Models.User
+@{
+    ViewData["Title"] = "Profile";
+}
+
+<h2>My Profile</h2>
+
+<div class="row">
+    <div class="col-md-4">
+        <div class="card">
+           <div class="card-body">
+            <h5 class="card-title">@Model.Username</h5>
+            <p class="card-text">@Model.Email</p>
+            <p class="card-text"><small class="text-muted">Member since @Model.CreadtedAt.ToString("MMM yyyy")</small></p>
+            <p class="card-text"><strong>Pictures uploaded: @Model.Pictures.Count</strong></p>
+        </div>
+    </div>
+</div>
+
+<div class="col-md-8">
+    <h4>My Pictures</h4>
+    @if(Model.Pictures.Any()){
+        <div class="=row">
+            @foreach(var picture in Model.Pictures.OrderByDescending(p => p.UploadedAt)){
+                <div class="col-md-6 mb-3">
+                    <div class="card">
+                        <img src="~/uploads/@picture.FileName" class="card-img-top" alt="My Picture" style="height: 150px; object-fit: cover;">
+                        <div class="card-body p-2">
+                            @if(!string.IsNullOrEmpty(picture.Description)){
+                                <p class="card-text small">@picture.Description</p>
+                            }
+                            <small class="text-muted">@picture.UploadedAt.ToString("MMM dd, yyyy")</small>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    }
+    else
+    {
+        <p>No Pictures uploaded yet. <a asp-controller="Home" asp-action="Upload">Upload your first picture!</a></p>
+    }
+</div>
+</div>
