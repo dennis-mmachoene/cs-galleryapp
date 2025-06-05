@@ -3,31 +3,501 @@
     ViewData["Title"] = "Upload Picture";
 }
 
-<form asp-action="Upload" method="post" enctype="multipart/form-data">
-@Html.AntiForgeryToken()
+<style>
+    .upload-container {
+        max-width: 800px;
+        margin: 0 auto;
+        padding: 2rem;
+    }
+    
+    .upload-header {
+        text-align: center;
+        margin-bottom: 3rem;
+    }
+    
+    .upload-header h1 {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        font-weight: 700;
+        margin-bottom: 0.5rem;
+    }
+    
+    .upload-header p {
+        color: #6c757d;
+        font-size: 1.1rem;
+    }
+    
+    .upload-form {
+        background: white;
+        padding: 2.5rem;
+        border-radius: 20px;
+        box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+        border: 1px solid #e9ecef;
+    }
+    
+    .file-upload-area {
+        border: 3px dashed #dee2e6;
+        border-radius: 15px;
+        padding: 3rem 2rem;
+        text-align: center;
+        transition: all 0.3s ease;
+        background: #f8f9fa;
+        position: relative;
+        cursor: pointer;
+        margin-bottom: 2rem;
+    }
+    
+    .file-upload-area.dragover {
+        border-color: #667eea;
+        background: rgba(102, 126, 234, 0.05);
+        transform: scale(1.02);
+    }
+    
+    .file-upload-area:hover {
+        border-color: #667eea;
+        background: rgba(102, 126, 234, 0.02);
+    }
+    
+    .upload-icon {
+        font-size: 3rem;
+        color: #667eea;
+        margin-bottom: 1rem;
+    }
+    
+    .upload-text {
+        margin-bottom: 1rem;
+    }
+    
+    .upload-text h5 {
+        color: #495057;
+        margin-bottom: 0.5rem;
+    }
+    
+    .upload-text p {
+        color: #6c757d;
+        margin-bottom: 0;
+    }
+    
+    .file-input {
+        display: none;
+    }
+    
+    .browse-btn {
+        background: linear-gradient(45deg, #667eea, #764ba2);
+        border: none;
+        color: white;
+        padding: 0.75rem 2rem;
+        border-radius: 25px;
+        font-weight: 600;
+        transition: all 0.3s ease;
+        cursor: pointer;
+        display: inline-block;
+        text-decoration: none;
+    }
+    
+    .browse-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        color: white;
+    }
+    
+    .file-preview {
+        display: none;
+        margin-top: 1.5rem;
+        padding: 1.5rem;
+        background: #f8f9fa;
+        border-radius: 15px;
+        border: 1px solid #dee2e6;
+    }
+    
+    .preview-image {
+        max-width: 200px;
+        max-height: 200px;
+        border-radius: 10px;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        margin-bottom: 1rem;
+    }
+    
+    .file-info {
+        color: #495057;
+    }
+    
+    .file-info strong {
+        color: #212529;
+    }
+    
+    .remove-file {
+        background: #dc3545;
+        border: none;
+        color: white;
+        padding: 0.5rem 1rem;
+        border-radius: 20px;
+        font-size: 0.9rem;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        margin-top: 1rem;
+    }
+    
+    .remove-file:hover {
+        background: #c82333;
+        transform: translateY(-1px);
+    }
+    
+    .form-group {
+        margin-bottom: 2rem;
+    }
+    
+    .form-label {
+        font-weight: 600;
+        color: #495057;
+        margin-bottom: 0.8rem;
+        display: block;
+    }
+    
+    .form-control {
+        border: 2px solid #e9ecef;
+        border-radius: 10px;
+        padding: 0.75rem 1rem;
+        font-size: 1rem;
+        transition: all 0.3s ease;
+    }
+    
+    .form-control:focus {
+        border-color: #667eea;
+        box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25);
+    }
+    
+    .form-text {
+        color: #6c757d;
+        font-size: 0.9rem;
+        margin-top: 0.5rem;
+    }
+    
+    .btn-group {
+        display: flex;
+        gap: 1rem;
+        justify-content: center;
+        margin-top: 2rem;
+        padding-top: 2rem;
+        border-top: 1px solid #e9ecef;
+    }
+    
+    .btn-upload {
+        background: linear-gradient(45deg, #28a745, #20c997);
+        border: none;
+        color: white;
+        padding: 0.875rem 2.5rem;
+        border-radius: 25px;
+        font-weight: 600;
+        font-size: 1.1rem;
+        transition: all 0.3s ease;
+        cursor: pointer;
+    }
+    
+    .btn-upload:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 20px rgba(40, 167, 69, 0.4);
+    }
+    
+    .btn-upload:disabled {
+        background: #6c757d;
+        cursor: not-allowed;
+        transform: none;
+        box-shadow: none;
+    }
+    
+    .btn-cancel {
+        background: #6c757d;
+        border: none;
+        color: white;
+        padding: 0.875rem 2rem;
+        border-radius: 25px;
+        font-weight: 600;
+        text-decoration: none;
+        transition: all 0.3s ease;
+        display: inline-block;
+    }
+    
+    .btn-cancel:hover {
+        background: #5a6268;
+        color: white;
+        text-decoration: none;
+        transform: translateY(-1px);
+    }
+    
+    .validation-summary {
+        background: #f8d7da;
+        border: 1px solid #f5c6cb;
+        color: #721c24;
+        padding: 1rem;
+        border-radius: 10px;
+        margin-bottom: 2rem;
+    }
+    
+    .text-danger {
+        color: #dc3545 !important;
+        font-size: 0.9rem;
+        margin-top: 0.5rem;
+        display: block;
+    }
+    
+    .progress-bar {
+        display: none;
+        width: 100%;
+        height: 8px;
+        background: #e9ecef;
+        border-radius: 4px;
+        margin-top: 1rem;
+        overflow: hidden;
+    }
+    
+    .progress-fill {
+        height: 100%;
+        background: linear-gradient(45deg, #667eea, #764ba2);
+        width: 0%;
+        transition: width 0.3s ease;
+        border-radius: 4px;
+    }
+    
+    .fade-in {
+        animation: fadeIn 0.6s ease-in-out;
+    }
+    
+    @@keyframes fadeIn {
+        from { opacity: 0; transform: translateY(20px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+    
+    @@media (max-width: 768px) {
+        .upload-container {
+            padding: 1rem;
+        }
+        
+        .upload-form {
+            padding: 1.5rem;
+        }
+        
+        .file-upload-area {
+            padding: 2rem 1rem;
+        }
+        
+        .btn-group {
+            flex-direction: column;
+            align-items: center;
+        }
+        
+        .btn-upload, .btn-cancel {
+            width: 100%;
+            max-width: 300px;
+        }
+    }
+</style>
 
-<div asp-validation-summary="ModelOnly" class="text-danger"></div>
+<div class="upload-container">
+    <div class="upload-header fade-in">
+        <h1 class="display-4">Upload Picture</h1>
+        <p>Share your amazing photos with the world</p>
+    </div>
 
-<div class="form-group mb-3">
-    <label asp-for="Image" class="control-label"></label>
-    <input asp-for="Image" class="form-control" type="file" accept="image/*" />
-    <span asp-validation-for="Image" class="text-danger"></span>
-    <small class="form-text text-muted">Max file size: 5MB. Supported formats: JPG, PNG, GIF</small>
+    <div class="upload-form fade-in">
+        <form asp-action="Upload" method="post" enctype="multipart/form-data" id="uploadForm">
+            @Html.AntiForgeryToken()
+
+            <div asp-validation-summary="ModelOnly" class="validation-summary"></div>
+
+            <div class="form-group">
+                <label asp-for="Image" class="form-label">
+                    <i class="fas fa-image me-2"></i>Choose Your Picture
+                </label>
+                
+                <div class="file-upload-area" id="fileUploadArea">
+                    <div class="upload-content">
+                        <i class="fas fa-cloud-upload-alt upload-icon"></i>
+                        <div class="upload-text">
+                            <h5>Drag & Drop your image here</h5>
+                            <p>or click to browse your files</p>
+                        </div>
+                        <button type="button" class="browse-btn" onclick="document.getElementById('fileInput').click()">
+                            <i class="fas fa-folder-open me-2"></i>Browse Files
+                        </button>
+                    </div>
+                    
+                    <input asp-for="Image" class="file-input" id="fileInput" type="file" accept="image/*" />
+                </div>
+                
+                <div class="file-preview" id="filePreview">
+                    <div class="d-flex align-items-start">
+                        <img id="previewImage" class="preview-image me-3" src="" alt="Preview">
+                        <div class="file-info flex-grow-1">
+                            <div id="fileName" class="mb-2"></div>
+                            <div id="fileSize" class="mb-2"></div>
+                            <button type="button" class="remove-file" onclick="removeFile()">
+                                <i class="fas fa-times me-1"></i>Remove
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                
+                <span asp-validation-for="Image" class="text-danger"></span>
+                <div class="form-text">
+                    <i class="fas fa-info-circle me-1"></i>
+                    Max file size: 5MB. Supported formats: JPG, PNG, GIF
+                </div>
+                
+                <div class="progress-bar" id="progressBar">
+                    <div class="progress-fill" id="progressFill"></div>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label asp-for="Description" class="form-label">
+                    <i class="fas fa-pen me-2"></i>Description (Optional)
+                </label>
+                <textarea asp-for="Description" class="form-control" rows="4" 
+                          placeholder="Tell us about your picture... What makes it special?"></textarea>
+                <span asp-validation-for="Description" class="text-danger"></span>
+                <div class="form-text">
+                    <i class="fas fa-lightbulb me-1"></i>
+                    A good description helps others appreciate your photo
+                </div>
+            </div>
+
+            <div class="btn-group">
+                <button type="submit" class="btn-upload" id="uploadBtn" disabled>
+                    <i class="fas fa-upload me-2"></i>Upload Picture
+                </button>
+                <a asp-action="Index" class="btn-cancel">
+                    <i class="fas fa-times me-2"></i>Cancel
+                </a>
+            </div>
+        </form>
+    </div>
 </div>
 
-<div class="form-group mb-3">
-    <label asp-for="Description" class="control-label"></label>
-    <textarea asp-for="Description" class="form-control" rows="3"></textarea>
-    <span asp-validation-for="Description" class="text-danger"></span>
-</div>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const fileUploadArea = document.getElementById('fileUploadArea');
+    const fileInput = document.getElementById('fileInput');
+    const filePreview = document.getElementById('filePreview');
+    const previewImage = document.getElementById('previewImage');
+    const fileName = document.getElementById('fileName');
+    const fileSize = document.getElementById('fileSize');
+    const uploadBtn = document.getElementById('uploadBtn');
 
-<div class="form-group">
-    <input type="submit" value="Upload" class="btn btn-primary" />
-    <a asp-action="Index" class="btn btn-secondary">Cancel</a>
-</div>
+    // Drag and drop functionality
+    fileUploadArea.addEventListener('dragover', function(e) {
+        e.preventDefault();
+        fileUploadArea.classList.add('dragover');
+    });
 
-</form>
+    fileUploadArea.addEventListener('dragleave', function(e) {
+        e.preventDefault();
+        fileUploadArea.classList.remove('dragover');
+    });
+
+    fileUploadArea.addEventListener('drop', function(e) {
+        e.preventDefault();
+        fileUploadArea.classList.remove('dragover');
+        
+        const files = e.dataTransfer.files;
+        if (files.length > 0) {
+            handleFileSelect(files[0]);
+        }
+    });
+
+    // Click to upload
+    fileUploadArea.addEventListener('click', function() {
+        fileInput.click();
+    });
+
+    // File input change
+    fileInput.addEventListener('change', function() {
+        if (this.files.length > 0) {
+            handleFileSelect(this.files[0]);
+        }
+    });
+
+    function handleFileSelect(file) {
+        // Validate file type
+        if (!file.type.startsWith('image/')) {
+            alert('Please select an image file.');
+            return;
+        }
+
+        // Validate file size (5MB)
+        if (file.size > 5 * 1024 * 1024) {
+            alert('File size must be less than 5MB.');
+            return;
+        }
+
+        // Update file input
+        const dt = new DataTransfer();
+        dt.items.add(file);
+        fileInput.files = dt.files;
+
+        // Show preview
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            previewImage.src = e.target.result;
+            fileName.innerHTML = `<strong>File:</strong> ${file.name}`;
+            fileSize.innerHTML = `<strong>Size:</strong> ${formatFileSize(file.size)}`;
+            
+            filePreview.style.display = 'block';
+            uploadBtn.disabled = false;
+        };
+        reader.readAsDataURL(file);
+    }
+
+    function formatFileSize(bytes) {
+        if (bytes === 0) return '0 Bytes';
+        const k = 1024;
+        const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+        const i = Math.floor(Math.log(bytes) / Math.log(k));
+        return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+    }
+
+    // Remove file function
+    window.removeFile = function() {
+        fileInput.value = '';
+        filePreview.style.display = 'none';
+        uploadBtn.disabled = true;
+    };
+
+    // Form submission with progress simulation
+    document.getElementById('uploadForm').addEventListener('submit', function(e) {
+        if (!fileInput.files.length) {
+            e.preventDefault();
+            alert('Please select a file to upload.');
+            return;
+        }
+
+        // Show progress bar
+        const progressBar = document.getElementById('progressBar');
+        const progressFill = document.getElementById('progressFill');
+        
+        progressBar.style.display = 'block';
+        uploadBtn.disabled = true;
+        uploadBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Uploading...';
+
+        // Simulate progress (in real implementation, you'd track actual upload progress)
+        let progress = 0;
+        const interval = setInterval(() => {
+            progress += Math.random() * 30;
+            if (progress >= 90) {
+                progress = 90;
+                clearInterval(interval);
+            }
+            progressFill.style.width = progress + '%';
+        }, 200);
+    });
+});
+</script>
 
 @section Scripts{
     @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
 }
+
+<!-- Font Awesome for icons (add this to your layout if not already included) -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">

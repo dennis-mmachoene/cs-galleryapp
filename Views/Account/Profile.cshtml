@@ -3,42 +3,238 @@
     ViewData["Title"] = "Profile";
 }
 
-<h2>My Profile</h2>
+<style>
+    .profile-header {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        padding: 2rem 0;
+        margin-bottom: 2rem;
+        border-radius: 0 0 20px 20px;
+    }
+    
+    .profile-card {
+        border: none;
+        border-radius: 15px;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+        background: white;
+    }
+    
+    .profile-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 15px 40px rgba(0,0,0,0.15);
+    }
+    
+    .profile-avatar {
+        width: 120px;
+        height: 120px;
+        border-radius: 50%;
+        background: linear-gradient(45deg, #ff6b6b, #4ecdc4);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 3rem;
+        font-weight: bold;
+        color: white;
+        margin: 0 auto 1rem;
+        border: 4px solid white;
+        box-shadow: 0 5px 20px rgba(0,0,0,0.2);
+    }
+    
+    .stat-item {
+        text-align: center;
+        padding: 1rem;
+        border-radius: 10px;
+        background: linear-gradient(45deg, #f093fb 0%, #f5576c 100%);
+        color: white;
+        margin-bottom: 1rem;
+    }
+    
+    .stat-number {
+        font-size: 2rem;
+        font-weight: bold;
+        display: block;
+    }
+    
+    .stat-label {
+        font-size: 0.9rem;
+        opacity: 0.9;
+    }
+    
+    .picture-card {
+        border: none;
+        border-radius: 15px;
+        overflow: hidden;
+        transition: all 0.3s ease;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        height: 100%;
+    }
+    
+    .picture-card:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+    }
+    
+    .picture-card img {
+        transition: transform 0.3s ease;
+    }
+    
+    .picture-card:hover img {
+        transform: scale(1.05);
+    }
+    
+    .section-title {
+        position: relative;
+        padding-bottom: 1rem;
+        margin-bottom: 2rem;
+    }
+    
+    .section-title::after {
+        content: '';
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        width: 50px;
+        height: 3px;
+        background: linear-gradient(45deg, #667eea, #764ba2);
+        border-radius: 2px;
+    }
+    
+    .empty-state {
+        text-align: center;
+        padding: 3rem;
+        background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+        border-radius: 20px;
+        margin-top: 2rem;
+    }
+    
+    .upload-btn {
+        background: linear-gradient(45deg, #667eea, #764ba2);
+        border: none;
+        color: white;
+        padding: 0.8rem 2rem;
+        border-radius: 25px;
+        text-decoration: none;
+        display: inline-block;
+        transition: all 0.3s ease;
+        font-weight: 600;
+    }
+    
+    .upload-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        color: white;
+        text-decoration: none;
+    }
+    
+    .member-badge {
+        background: rgba(255,255,255,0.2);
+        padding: 0.5rem 1rem;
+        border-radius: 20px;
+        font-size: 0.9rem;
+        display: inline-block;
+        margin-top: 0.5rem;
+    }
+    
+    .picture-grid {
+        gap: 1.5rem;
+    }
+    
+    .fade-in {
+        animation: fadeIn 0.6s ease-in-out;
+    }
+    
+    @@keyframes fadeIn {
+        from { opacity: 0; transform: translateY(20px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+    
+    .profile-info h5 {
+        color: #2c3e50;
+        font-weight: 600;
+        margin-bottom: 0.5rem;
+    }
+    
+    .profile-info p {
+        color: #7f8c8d;
+        margin-bottom: 0.3rem;
+    }
+</style>
 
-<div class="row">
-    <div class="col-md-4">
-        <div class="card">
-           <div class="card-body">
-            <h5 class="card-title">@Model.Username</h5>
-            <p class="card-text">@Model.Email</p>
-            <p class="card-text"><small class="text-muted">Member since @Model.CreadtedAt.ToString("MMM yyyy")</small></p>
-            <p class="card-text"><strong>Pictures uploaded: @Model.Pictures.Count</strong></p>
+<div class="profile-header">
+    <div class="container">
+        <div class="text-center">
+            <h1 class="display-4 mb-0">My Profile</h1>
+            <p class="lead mb-0">Manage your gallery and personal information</p>
         </div>
     </div>
 </div>
 
-<div class="col-md-8">
-    <h4>My Pictures</h4>
-    @if(Model.Pictures.Any()){
-        <div class="=row">
-            @foreach(var picture in Model.Pictures.OrderByDescending(p => p.UploadedAt)){
-                <div class="col-md-6 mb-3">
-                    <div class="card">
-                        <img src="~/uploads/@picture.FileName" class="card-img-top" alt="My Picture" style="height: 150px; object-fit: cover;">
-                        <div class="card-body p-2">
-                            @if(!string.IsNullOrEmpty(picture.Description)){
-                                <p class="card-text small">@picture.Description</p>
-                            }
-                            <small class="text-muted">@picture.UploadedAt.ToString("MMM dd, yyyy")</small>
+<div class="container">
+    <div class="row">
+        <div class="col-lg-4 mb-4">
+            <div class="card profile-card fade-in">
+                <div class="card-body text-center p-4">
+                    <div class="profile-avatar">
+                        @Model.Username.Substring(0, 1).ToUpper()
+                    </div>
+                    <div class="profile-info">
+                        <h5 class="card-title mb-2">@Model.Username</h5>
+                        <p class="card-text text-muted mb-3">@Model.Email</p>
+                        <div class="member-badge">
+                            <i class="fas fa-calendar-alt me-2"></i>
+                            Member since @Model.CreadtedAt.ToString("MMM yyyy")
                         </div>
                     </div>
                 </div>
+            </div>
+            
+            <div class="stat-item fade-in mt-4">
+                <span class="stat-number">@Model.Pictures.Count</span>
+                <span class="stat-label">Pictures Uploaded</span>
+            </div>
+        </div>
+        
+        <div class="col-lg-8">
+            <h4 class="section-title">My Pictures</h4>
+            @if(Model.Pictures.Any()){
+                <div class="row picture-grid">
+                    @foreach(var picture in Model.Pictures.OrderByDescending(p => p.UploadedAt)){
+                        <div class="col-md-6 col-xl-4 mb-4">
+                            <div class="card picture-card fade-in">
+                                <img src="~/uploads/@picture.FileName" 
+                                     class="card-img-top" 
+                                     alt="@(!string.IsNullOrEmpty(picture.Description) ? picture.Description : "My Picture")" 
+                                     style="height: 200px; object-fit: cover;">
+                                <div class="card-body p-3">
+                                    @if(!string.IsNullOrEmpty(picture.Description)){
+                                        <p class="card-text small mb-2">@picture.Description</p>
+                                    }
+                                    <small class="text-muted">
+                                        <i class="fas fa-clock me-1"></i>
+                                        @picture.UploadedAt.ToString("MMM dd, yyyy")
+                                    </small>
+                                </div>
+                            </div>
+                        </div>
+                    }
+                </div>
+            }
+            else
+            {
+                <div class="empty-state fade-in">
+                    <i class="fas fa-images fa-3x text-muted mb-3"></i>
+                    <h5 class="text-muted mb-3">No Pictures Yet</h5>
+                    <p class="text-muted mb-4">Start building your gallery by uploading your first picture!</p>
+                    <a asp-controller="Home" asp-action="Upload" class="upload-btn">
+                        <i class="fas fa-upload me-2"></i>
+                        Upload Your First Picture
+                    </a>
+                </div>
             }
         </div>
-    }
-    else
-    {
-        <p>No Pictures uploaded yet. <a asp-controller="Home" asp-action="Upload">Upload your first picture!</a></p>
-    }
+    </div>
 </div>
-</div>
+
+<!-- Font Awesome for icons (add this to your layout if not already included) -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
